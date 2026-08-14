@@ -130,7 +130,7 @@ export const scenes: Scene[] = [
           { at: 0.7, opacity: 0, y: -12, ease: 'in' },
         ],
       },
-      { id: 'meta', tag: 'meta', align: 'end', x: 7, y: 82, mobileY: 88, text: 'AN OPEN OCEAN', keys: metaKeys },
+      { id: 'meta', tag: 'meta', align: 'end', x: 7, y: 82, mobileY: 88, text: 'TAKEOFF · ABOVE THE CLOUDS', keys: metaKeys },
     ],
   },
 
