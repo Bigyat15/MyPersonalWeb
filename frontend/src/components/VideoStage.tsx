@@ -166,19 +166,19 @@ export function VideoStage({ reducedMotion }: VideoStageProps) {
         if (opacity < 0.02) continue
         const media = el as HTMLVideoElement
         if (reducedMotion) continue
-        if (media.duration > 0 && !Number.isNaN(media.duration)) {
-          if (media.readyState >= 2) {
-            const target = chapters[i].progress * media.duration
-            if (Math.abs(media.currentTime - target) > 0.03) {
-              media.currentTime = target
-            }
-          } else {
-            // Safari (desktop + iOS) ignores preload hints on videos that
-            // never call play(), so a visible layer can sit stuck on its
-            // poster at readyState 1. An explicit load() is the reliable
-            // trigger that actually starts fetching its frames.
-            forceLoadOnce(media)
+        if (media.readyState >= 2 && media.duration > 0 && !Number.isNaN(media.duration)) {
+          const target = chapters[i].progress * media.duration
+          if (Math.abs(media.currentTime - target) > 0.03) {
+            media.currentTime = target
           }
+        } else if (media instanceof HTMLVideoElement) {
+          // Safari (desktop + iOS) ignores preload hints on videos that
+          // never call play(), so a visible layer can sit stuck on its
+          // poster at readyState 1 — and on iOS the metadata (and thus
+          // duration) may not even be fetched, so we must not gate this
+          // on duration being known. An explicit load() is the reliable
+          // trigger that actually starts fetching frames.
+          forceLoadOnce(media)
         }
       }
     })
