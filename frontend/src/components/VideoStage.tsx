@@ -68,12 +68,21 @@ const StageVideo = memo(function StageVideo({
  * Safari (desktop + iOS) often ignores `preload` on <video> elements
  * that never call play(), leaving them stuck on the poster at
  * readyState 1. Calling load() explicitly is the reliable way to make
- * it start fetching frames. Guarded so it only fires once while the
- * video is not yet ready.
+ * it start fetching frames.
+ *
+ * Retried instead of one-shot: a single attempt can be interrupted by
+ * heavy scrolling (or a busy main thread), which previously left the
+ * chapter stuck on its poster forever. The retry is throttled to once a
+ * second and skipped entirely while data is actively flowing, so a
+ * healthy download is never restarted.
  */
 function forceLoadOnce(el: HTMLVideoElement) {
-  if (el.readyState >= 2 || el.dataset.forceLoaded === '1') return
-  el.dataset.forceLoaded = '1'
+  if (el.readyState >= 2) return
+  if (el.networkState === HTMLMediaElement.NETWORK_LOADING && el.readyState >= 1) return
+  const now = Date.now()
+  const last = parseFloat(el.dataset.forceLoadedAt || '0')
+  if (now - last < 1000) return
+  el.dataset.forceLoadedAt = String(now)
   try {
     el.load()
   } catch {
