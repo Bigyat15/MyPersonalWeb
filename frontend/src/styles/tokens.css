@@ -1,0 +1,71 @@
+/* ─────────────────────────────────────────────
+   TOKENS — color, type, motion, space
+   ───────────────────────────────────────────── */
+:root {
+  /* Color — derived from the cinematic footage */
+  --ink-0: #060607;
+  --ink-1: #0b0c0e;
+  --ink-2: #131417;
+  --ink-3: #1c1d21;
+  --paper: #f2ede2;
+  --paper-dim: #b9b4a6;
+  --paper-faint: #7d7a70;
+  --gold: #e0b253;
+  --gold-deep: #b8862f;
+  --gold-soft: rgba(224, 178, 83, 0.16);
+  --cool: #9db3c9;
+
+  /* Scrims */
+  --scrim-strong: linear-gradient(
+    180deg,
+    rgba(6, 6, 7, 0.82) 0%,
+    rgba(6, 6, 7, 0.28) 42%,
+    rgba(6, 6, 7, 0.12) 60%,
+    rgba(6, 6, 7, 0.92) 100%
+  );
+  --scrim-top: linear-gradient(180deg, rgba(6, 6, 7, 0.72), rgba(6, 6, 7, 0));
+  --scrim-soft: linear-gradient(180deg, rgba(6, 6, 7, 0.2), rgba(6, 6, 7, 0.9));
+
+  /* Type */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Sizes (fluid, clamp-based) */
+  --t-hero: clamp(2.6rem, 8vw, 7.5rem);
+  --t-chapter: clamp(2.4rem, 6.2vw, 6rem);
+  --t-display: clamp(1.9rem, 5vw, 4.6rem);
+  --t-title: clamp(1.35rem, 2.6vw, 2.1rem);
+  --t-body: clamp(1rem, 1.15vw, 1.12rem);
+  --t-small: 0.78rem;
+  --t-label: 0.68rem;
+
+  /* Scene typography (dramatic editorial scale) */
+  --t-title-big: clamp(2.2rem, 8.5vw, 8.5rem);
+  --t-title-small: clamp(0.85rem, 1.7vw, 1.5rem);
+  --t-sub: clamp(1rem, 1.5vw, 1.35rem);
+
+  /* Type tracking */
+  --track-wide: 0.32em;
+  --track-ui: 0.14em;
+
+  /* Motion */
+  --ease-cinema: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-slow: 1600ms;
+  --dur-med: 900ms;
+  --dur-fast: 480ms;
+
+  /* Space */
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --rail-w: clamp(2.5rem, 6vw, 4.5rem);
+
+  /* Layers */
+  --z-stage: 2;
+  --z-webgl: 3;
+  --z-content: 4;
+  --z-chrome: 5;
+  --z-overlay: 8;
+  --z-transition: 6;
+  --z-intro: 10;
+}

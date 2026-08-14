@@ -1,0 +1,18 @@
+/* ─────────────────────────────────────────────
+   WEBGL — fixed ambient canvas
+   ───────────────────────────────────────────── */
+.webgl {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-webgl);
+  pointer-events: none;
+}
+
+/* Canvas is above the video stage so particles float over footage,
+   but content text stays on top. */
+.webgl canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,12 @@
+# Static asset caching (read by Netlify and similar hosts).
+# Videos and posters are immutable content that never changes between
+# deploys — tell browsers and CDNs to cache them for a year.
+
+/videos/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/posters/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

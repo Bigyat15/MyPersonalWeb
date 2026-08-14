@@ -1,0 +1,166 @@
+/* ─────────────────────────────────────────────
+   CINEMATIC LOADING SCREEN
+   A film-title opening: deep black, generous negative
+   space, staged editorial reveals and an honest,
+   Phase-01-only progress line.
+   ───────────────────────────────────────────── */
+
+.loading {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-intro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(120% 90% at 50% 28%, rgba(224, 178, 83, 0.05), transparent 60%),
+    var(--ink-0);
+  color: var(--paper);
+  opacity: 1;
+  transition: opacity var(--dur-med) var(--ease-cinema);
+  will-change: opacity;
+}
+
+.loading.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(1.6rem, 4vh, 3rem);
+  padding: 6vh var(--gutter) 4vh;
+  max-width: 90vw;
+}
+
+.loading__no {
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 1;
+  animation: loading-fade 0.6s ease backwards;
+  animation-delay: 0.1s;
+}
+
+.loading__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3rem, 11vw, 9rem);
+  line-height: 1.02;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--paper);
+  opacity: 1;
+  animation: loading-rise 0.9s var(--ease-cinema) backwards;
+  animation-delay: 0.45s;
+}
+
+.loading__tag {
+  font-family: var(--font-ui);
+  font-size: clamp(0.72rem, 1.4vw, 0.95rem);
+  letter-spacing: var(--track-ui);
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  opacity: 1;
+  animation: loading-fade 0.5s ease backwards;
+  animation-delay: 1.05s;
+}
+
+.loading__progress {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: min(18rem, 70vw);
+  opacity: 1;
+  animation: loading-fade 0.5s ease backwards;
+  animation-delay: 1.25s;
+}
+
+.loading__line {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: rgba(242, 237, 226, 0.18);
+  overflow: hidden;
+}
+
+.loading__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+  transition: width 0.4s var(--ease-soft);
+}
+
+.loading__pct {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--paper-dim);
+  min-width: 2.6em;
+  text-align: right;
+}
+
+/* Exit — text recedes quietly before the overlay dissolves. Entrance
+   keyframes are all complete before this phase is reached. */
+.loading.is-exiting .loading__no,
+.loading.is-exiting .loading__title,
+.loading.is-exiting .loading__tag,
+.loading.is-exiting .loading__progress {
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-cinema);
+}
+
+@keyframes loading-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes loading-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Responsive ─────────────────────────────── */
+
+@media (max-width: 700px) {
+  .loading__inner {
+    gap: clamp(1.4rem, 4.5vh, 2.4rem);
+  }
+  .loading__title {
+    font-size: clamp(2.6rem, 14vw, 4rem);
+    letter-spacing: 0.02em;
+  }
+  .loading__no {
+    letter-spacing: 0.26em;
+  }
+  .loading__progress {
+    width: min(16rem, 72vw);
+  }
+}
+
+@media (max-height: 640px) and (orientation: landscape) {
+  .loading__inner {
+    gap: 1.1rem;
+    padding: 5vh var(--gutter) 3vh;
+  }
+  .loading__title {
+    font-size: clamp(2.2rem, 9vh, 4.5rem);
+  }
+}

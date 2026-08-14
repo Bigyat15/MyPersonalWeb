@@ -1,0 +1,781 @@
+/* ─────────────────────────────────────────────
+   EXPERIENCE — stage, chapters, scenes, map
+   ───────────────────────────────────────────── */
+
+/* Fixed cinematic video stage behind everything */
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-stage);
+  overflow: hidden;
+  background: var(--ink-0);
+}
+
+/* Video layers are scrubbed by JS (opacity + currentTime). No CSS
+   transitions here — the crossfade is driven frame-by-frame. */
+.stage__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  background: var(--ink-0);
+  will-change: opacity;
+}
+
+/* Atmosphere grade — smooth visual continuity between scenes */
+.stage__atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: background var(--dur-slow) var(--ease-cinema);
+}
+
+.atmo-dawn {
+  background: radial-gradient(120% 90% at 50% 20%, rgba(224, 178, 83, 0.16), rgba(6, 6, 7, 0.3) 72%);
+}
+.atmo-ocean {
+  background: radial-gradient(120% 90% at 50% 58%, rgba(88, 128, 156, 0.16), rgba(6, 6, 7, 0.32) 78%);
+}
+.atmo-arrival {
+  background: radial-gradient(120% 90% at 50% 30%, rgba(226, 158, 96, 0.16), rgba(6, 6, 7, 0.3) 76%);
+}
+.atmo-study {
+  background: radial-gradient(120% 90% at 50% 46%, rgba(120, 142, 168, 0.12), rgba(6, 6, 7, 0.34) 80%);
+}
+.atmo-foundation {
+  background: radial-gradient(120% 90% at 50% 40%, rgba(224, 178, 83, 0.12), rgba(6, 6, 7, 0.34) 82%);
+}
+
+/* Soft vignette keeps the footage dominant while type stays readable */
+.stage__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(130% 100% at 50% 46%, transparent 56%, rgba(6, 6, 7, 0.36) 100%),
+    linear-gradient(180deg, rgba(6, 6, 7, 0.3), rgba(6, 6, 7, 0) 20%, rgba(6, 6, 7, 0) 76%, rgba(6, 6, 7, 0.42));
+  pointer-events: none;
+}
+
+/* Scrollable story above the stage */
+.content {
+  position: relative;
+  z-index: var(--z-content);
+}
+
+/* ── CHAPTER — tall scroll section with a pinned frame ────────── */
+.chapter {
+  position: relative;
+  height: 320vh;
+}
+
+.chapter__frame {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--paper);
+}
+
+/* Per-scene ink colours chosen to sit inside each scene's light */
+.chapter[data-tone='light'] {
+  --fg: #f6f0e4;
+  --fg-dim: #cbc4b2;
+  --fg-faint: rgba(246, 240, 228, 0.42);
+  --accent: #e0b253;
+}
+.chapter[data-tone='warm'] {
+  --fg: #ffebc4;
+  --fg-dim: #e2bd82;
+  --fg-faint: rgba(255, 235, 196, 0.42);
+  --accent: #f0c878;
+}
+.chapter[data-tone='cool'] {
+  --fg: #eaf1f7;
+  --fg-dim: #b7c6d4;
+  --fg-faint: rgba(234, 241, 247, 0.4);
+  --accent: #a9c0d8;
+}
+
+/* ── SCENE LAYERS ──────────────────────────── */
+/* Positioning is data-driven via CSS variables so media queries can
+   re-place layers (e.g. the portrait film-frame layout). */
+.layer {
+  position: absolute;
+  max-width: min(82vw, 58rem);
+  pointer-events: none;
+  top: var(--mobY);
+}
+
+.layer[data-malign='start'] {
+  left: var(--mobX);
+  text-align: left;
+}
+.layer[data-malign='center'] {
+  left: var(--mobX);
+  transform: translateX(-50%);
+  text-align: center;
+}
+.layer[data-malign='end'] {
+  right: var(--mobX);
+  text-align: right;
+}
+
+/* The animated child — the choreography engine writes directly here */
+.layer__anim {
+  display: inline-block;
+  opacity: 0;
+  will-change: transform, opacity, clip-path;
+}
+
+.layer--number {
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+  text-shadow: 0 1px 3px rgba(6, 6, 7, 0.6), 0 2px 10px rgba(6, 6, 7, 0.35);
+}
+
+.layer--location {
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  text-shadow: 0 1px 3px rgba(6, 6, 7, 0.6), 0 2px 10px rgba(6, 6, 7, 0.35);
+}
+
+.layer--title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  color: var(--fg);
+  text-shadow:
+    0 2px 4px rgba(6, 6, 7, 0.45),
+    0 10px 40px rgba(6, 6, 7, 0.55);
+}
+
+.title__split {
+  display: flex;
+  flex-direction: column;
+}
+
+.split__small {
+  font-size: var(--t-title-small);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-left: 0.34em;
+}
+
+.split__big {
+  font-size: var(--t-title-big);
+  line-height: 1.03;
+  letter-spacing: -0.015em;
+}
+
+.layer[data-malign='start'] .title__split {
+  align-items: flex-start;
+  text-align: left;
+}
+.layer[data-malign='center'] .title__split {
+  align-items: center;
+  text-align: center;
+}
+.layer[data-malign='center'] {
+  text-align: center;
+}
+.layer[data-malign='end'] .title__split {
+  align-items: flex-end;
+  text-align: right;
+}
+.layer[data-malign='end'] {
+  text-align: right;
+}
+
+.layer--sub {
+  font-size: var(--t-sub);
+  font-weight: 300;
+  color: var(--fg-dim);
+  max-width: 30rem;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(6, 6, 7, 0.55), 0 4px 16px rgba(6, 6, 7, 0.45);
+}
+
+.layer--meta {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: var(--track-ui);
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  text-shadow: 0 1px 3px rgba(6, 6, 7, 0.6);
+}
+
+/* ── ADAPTIVE TEXT CONTRAST ────────────────────────
+   The text-contrast manager writes `data-contrast` on each .layer from
+   the video region behind it. These rules translate the treatment into
+   ink + shadow choices; the transitions smooth every switch. Nothing
+   here is animated by the scroll engine, so scrubbing stays unaffected.
+   (Reduced motion users get instant switches via the global 0.001ms
+   transition override in reduced.css.) */
+.layer__anim {
+  transition:
+    color 300ms var(--ease-cinema),
+    text-shadow 300ms var(--ease-cinema);
+}
+
+/* Light treatment (dark video) — the existing design is left as-is. */
+
+/* Light text + extra shadow for mid-tone / busy regions (Option C). */
+.layer[data-contrast='light-shadow'] .layer__anim {
+  text-shadow:
+    0 1px 2px rgba(6, 6, 7, 0.7),
+    0 2px 8px rgba(6, 6, 7, 0.6),
+    0 8px 24px rgba(6, 6, 7, 0.55);
+}
+
+/* Dark ink for bright video (Option B) — a dark variant of each role
+   keeps the scene's hierarchy while staying readable. */
+.layer[data-contrast='dark'].layer--number,
+.layer[data-contrast='dark-shadow'].layer--number {
+  color: #8a6419;
+}
+.layer[data-contrast='dark'].layer--location,
+.layer[data-contrast='dark-shadow'].layer--location {
+  color: #3c3b35;
+}
+.layer[data-contrast='dark'].layer--title,
+.layer[data-contrast='dark-shadow'].layer--title {
+  color: #141414;
+}
+.layer[data-contrast='dark'].layer--sub,
+.layer[data-contrast='dark-shadow'].layer--sub {
+  color: #2a2926;
+}
+.layer[data-contrast='dark'].layer--meta,
+.layer[data-contrast='dark-shadow'].layer--meta {
+  color: #403f3a;
+}
+.layer[data-contrast='dark'] .split__small,
+.layer[data-contrast='dark-shadow'] .split__small {
+  color: #6b6657;
+}
+
+/* Bright regions keep a soft light shadow so dark ink separates from a
+   busy bright frame. */
+.layer[data-contrast='dark'] .layer__anim,
+.layer[data-contrast='dark-shadow'] .layer__anim {
+  text-shadow:
+    0 1px 2px rgba(246, 240, 228, 0.35),
+    0 1px 8px rgba(246, 240, 228, 0.25);
+}
+.layer[data-contrast='dark-shadow'] .layer__anim {
+  text-shadow:
+    0 1px 2px rgba(246, 240, 228, 0.6),
+    0 2px 6px rgba(246, 240, 228, 0.4),
+    0 6px 18px rgba(246, 240, 228, 0.35);
+}
+
+/* Backdrop protection (Option D) — a soft blurred gradient plate behind
+   the glyphs for very busy regions. */
+.layer[data-contrast='backdrop'] .layer__anim {
+  position: relative;
+  z-index: 0;
+  text-shadow:
+    0 1px 2px rgba(6, 6, 7, 0.8),
+    0 2px 10px rgba(6, 6, 7, 0.6),
+    0 10px 28px rgba(6, 6, 7, 0.5);
+}
+.layer[data-contrast='backdrop'] .layer__anim::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -0.5em -1.2em;
+  border-radius: 0.8em;
+  background: linear-gradient(
+    180deg,
+    rgba(6, 6, 7, 0),
+    rgba(6, 6, 7, 0.42) 50%,
+    rgba(6, 6, 7, 0)
+  );
+  filter: blur(18px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms var(--ease-cinema);
+}
+.layer[data-contrast='backdrop'] .layer__anim::before {
+  opacity: 1;
+}
+
+/* ── ROUTE MAP ─────────────────────────────── */
+.map {
+  position: relative;
+  min-height: 170vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14vh clamp(2rem, 6vw, 7rem);
+  background:
+    linear-gradient(180deg, rgba(6, 6, 7, 0.96), rgba(6, 6, 7, 0.9)),
+    radial-gradient(90% 60% at 50% 42%, rgba(224, 178, 83, 0.06), transparent 70%);
+}
+
+.map__inner {
+  position: relative;
+  width: 100%;
+  max-width: 74rem;
+}
+
+.map__head {
+  text-align: center;
+  margin-bottom: clamp(3rem, 6vh, 5rem);
+}
+
+.map__head .eyebrow {
+  display: block;
+  margin-bottom: 0.9rem;
+}
+
+.map__title {
+  font-size: var(--t-display);
+  line-height: 1.06;
+}
+
+.map__path {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.map__line {
+  position: absolute;
+  top: 2.6rem;
+  bottom: 2.6rem;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: rgba(242, 237, 226, 0.12);
+  overflow: hidden;
+}
+
+.map__line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--gold-deep), var(--gold));
+  transform: translateY(-101%);
+  transition: transform 1.4s var(--ease-cinema);
+}
+
+.map.is-inview .map__line::after {
+  transform: translateY(0);
+}
+
+.map__node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 11rem;
+  cursor: pointer;
+  border: 0;
+  text-align: left;
+  color: inherit;
+  padding: 1rem 0;
+  isolation: isolate;
+}
+
+.map__node::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3.2rem;
+  height: 3.2rem;
+  transform: translate(-50%, -50%);
+  background: var(--ink-1);
+  border: 1px solid rgba(242, 237, 226, 0.16);
+  border-radius: 50%;
+  transition: border-color var(--dur-fast) var(--ease-soft), box-shadow var(--dur-fast) var(--ease-soft);
+}
+
+.map__node:hover::before,
+.map__node:focus-visible::before {
+  border-color: var(--gold);
+}
+
+.map__node.is-current::before {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(224, 178, 83, 0.12), 0 0 34px rgba(224, 178, 83, 0.28);
+}
+
+.map__node.is-current::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.6rem;
+  height: 0.6rem;
+  transform: translate(-50%, -50%);
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+@keyframes nodePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(224, 178, 83, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(224, 178, 83, 0);
+  }
+}
+
+.map__node.is-current::before {
+  animation: nodePulse 3.2s var(--ease-soft) infinite;
+}
+
+.map__node.is-future::before {
+  border-style: dashed;
+  opacity: 0.55;
+}
+
+.map__node:nth-child(odd) .map__node-copy {
+  margin-right: auto;
+  margin-left: 0;
+}
+.map__node:nth-child(even) .map__node-copy {
+  margin-left: auto;
+  margin-right: 0;
+  text-align: right;
+}
+
+.map__node-copy {
+  width: min(44%, 24rem);
+  padding: 1.6rem 0;
+  opacity: 0.5;
+  transition: opacity var(--dur-fast) var(--ease-soft);
+}
+
+.map__node:hover .map__node-copy,
+.map__node:focus-visible .map__node-copy,
+.map__node.is-current .map__node-copy {
+  opacity: 1;
+}
+
+.map__node-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.75rem;
+}
+
+.map__node:nth-child(odd) .map__node-head {
+  flex-direction: row;
+}
+
+.map__node:nth-child(even) .map__node-head {
+  flex-direction: row-reverse;
+}
+
+.map__node-loc {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.2vw, 1.9rem);
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+}
+
+.map__node-num {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: var(--gold);
+  margin-top: 0.12em;
+}
+
+.map__node-sub {
+  display: block;
+  font-size: var(--t-small);
+  color: var(--paper-dim);
+  letter-spacing: var(--track-ui);
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  line-height: 1.5;
+  margin-top: 0.6rem;
+}
+
+.map__node-status {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: var(--track-ui);
+  color: var(--paper-faint);
+  text-transform: uppercase;
+}
+
+.map__node.is-future .map__node-status {
+  color: var(--paper-faint);
+}
+
+.map__node.is-current .map__node-status {
+  color: var(--gold);
+}
+
+/* ── CURRENTLY ─────────────────────────────── */
+.currently {
+  position: relative;
+  min-height: 130vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16vh var(--gutter);
+  background:
+    linear-gradient(180deg, rgba(6, 6, 7, 0.97), rgba(6, 6, 7, 0.92)),
+    radial-gradient(80% 60% at 50% 30%, rgba(224, 178, 83, 0.07), transparent 70%);
+}
+
+.currently__inner {
+  text-align: center;
+  max-width: 52rem;
+}
+
+.currently__eyebrow {
+  display: inline-block;
+  margin-bottom: 1.4rem;
+}
+
+.currently__role {
+  font-family: var(--font-display);
+  font-size: var(--t-chapter);
+  line-height: 1.04;
+  margin-bottom: 1.6rem;
+}
+
+.currently__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.42rem 0.95rem;
+  border: 1px solid rgba(224, 178, 83, 0.45);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-ui);
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 2.4rem;
+}
+
+.currently__status .pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+@keyframes dotPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+.currently__status .pulse-dot {
+  animation: dotPulse 2.2s var(--ease-soft) infinite;
+}
+
+.currently__lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--paper-dim);
+  font-size: var(--t-title);
+  font-weight: 300;
+}
+
+.currently__meta {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-top: 2.6rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--track-ui);
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+/* ── FUTURE ────────────────────────────────── */
+.future {
+  position: relative;
+  min-height: 130vh;
+  display: flex;
+  align-items: center;
+  padding: 16vh var(--gutter);
+}
+
+.future__inner {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.future__head {
+  margin-bottom: clamp(2.5rem, 5vh, 4rem);
+}
+
+.future__head .eyebrow {
+  display: block;
+  margin-bottom: 0.9rem;
+}
+
+.future__title {
+  font-size: var(--t-display);
+}
+
+.future__note {
+  color: var(--paper-dim);
+  max-width: 34rem;
+  margin-top: 1rem;
+}
+
+.future__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+  gap: 1.1rem;
+}
+
+.future__item {
+  position: relative;
+  border: 1px dashed rgba(242, 237, 226, 0.18);
+  border-radius: 2px;
+  padding: 1.6rem 1.5rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  transition: border-color var(--dur-fast) var(--ease-soft), transform var(--dur-fast) var(--ease-soft);
+}
+
+.future__item:hover {
+  border-color: rgba(224, 178, 83, 0.4);
+  transform: translateY(-3px);
+}
+
+.future__item-phase {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: var(--track-ui);
+  color: var(--paper-faint);
+}
+
+.future__item-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  line-height: 1.1;
+}
+
+.future__item-hint {
+  color: var(--paper-dim);
+  font-size: var(--t-small);
+  flex: 1;
+}
+
+.future__item-tag {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: var(--track-ui);
+  text-transform: uppercase;
+  color: var(--paper-faint);
+  border: 1px solid rgba(242, 237, 226, 0.2);
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  margin-top: 0.4rem;
+}
+
+/* ── CLOSING ───────────────────────────────── */
+.closing {
+  position: relative;
+  min-height: 105vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 14vh var(--gutter);
+  background:
+    radial-gradient(70% 50% at 50% 42%, rgba(224, 178, 83, 0.08), transparent 72%),
+    linear-gradient(180deg, rgba(6, 6, 7, 0.95), var(--ink-0));
+}
+
+.closing__line {
+  font-family: var(--font-display);
+  font-size: var(--t-chapter);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.closing__sub {
+  margin-top: 1.6rem;
+  color: var(--paper-dim);
+  max-width: 26rem;
+}
+
+.closing__cta {
+  margin-top: 2.6rem;
+}
+
+.closing__footer {
+  position: absolute;
+  bottom: 2rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 var(--gutter);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: var(--track-ui);
+  text-transform: uppercase;
+  color: var(--paper-faint);
+}
+
+/* Generic section reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity var(--dur-slow) var(--ease-cinema),
+    transform var(--dur-slow) var(--ease-cinema);
+}
+
+.is-inview .reveal,
+.reveal.is-inview {
+  opacity: 1;
+  transform: none;
+}
+
+.is-inview .reveal.d1 {
+  transition-delay: 140ms;
+}
+.is-inview .reveal.d2 {
+  transition-delay: 300ms;
+}
+.is-inview .reveal.d3 {
+  transition-delay: 460ms;
+}

@@ -1,0 +1,49 @@
+/* ─────────────────────────────────────────────
+   REDUCED MOTION
+   ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .stage__atmosphere,
+  .stage__scrim {
+    transition: none !important;
+  }
+
+  /* Scene layers are fully readable and static — the keyframe
+     engine's inline writes are overridden. */
+  .layer__anim {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+    letter-spacing: normal !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .chrome__progress-fill {
+    width: 0 !important;
+  }
+
+  /* Loading screen: reveal everything at once, then exit promptly. */
+  .loading__no,
+  .loading__title,
+  .loading__tag,
+  .loading__progress {
+    animation-delay: 0s !important;
+  }
+
+  .chrome__dot::after {
+    transform: scaleX(0) !important;
+  }
+}
