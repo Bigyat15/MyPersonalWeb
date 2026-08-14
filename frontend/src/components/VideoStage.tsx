@@ -65,6 +65,23 @@ const StageVideo = memo(function StageVideo({
 })
 
 /**
+ * Safari (desktop + iOS) often ignores `preload` on <video> elements
+ * that never call play(), leaving them stuck on the poster at
+ * readyState 1. Calling load() explicitly is the reliable way to make
+ * it start fetching frames. Guarded so it only fires once while the
+ * video is not yet ready.
+ */
+function forceLoadOnce(el: HTMLVideoElement) {
+  if (el.readyState >= 2 || el.dataset.forceLoaded === '1') return
+  el.dataset.forceLoaded = '1'
+  try {
+    el.load()
+  } catch {
+    /* ignore decode/load errors; the poster fallback stays */
+  }
+}
+
+/**
  * The fixed cinematic stage behind the story.
  *
  * Videos are never played. A per-frame callback in the scroll system
@@ -124,7 +141,10 @@ export function VideoStage({ reducedMotion }: VideoStageProps) {
         const incoming = chapters[active + 1]
         if (incoming && incoming.progress > 0.25) {
           const el = mediaRefs.current.get(active + 1)
-          if (el instanceof HTMLVideoElement && el.preload !== 'auto') el.preload = 'auto'
+          if (el instanceof HTMLVideoElement) {
+            if (el.preload !== 'auto') el.preload = 'auto'
+            forceLoadOnce(el)
+          }
         }
       }
 
@@ -145,10 +165,19 @@ export function VideoStage({ reducedMotion }: VideoStageProps) {
         // the brief double-crossfade bands.
         if (opacity < 0.02) continue
         const media = el as HTMLVideoElement
-        if (!reducedMotion && media.readyState >= 2 && media.duration > 0 && !Number.isNaN(media.duration)) {
-          const target = chapters[i].progress * media.duration
-          if (Math.abs(media.currentTime - target) > 0.03) {
-            media.currentTime = target
+        if (reducedMotion) continue
+        if (media.duration > 0 && !Number.isNaN(media.duration)) {
+          if (media.readyState >= 2) {
+            const target = chapters[i].progress * media.duration
+            if (Math.abs(media.currentTime - target) > 0.03) {
+              media.currentTime = target
+            }
+          } else {
+            // Safari (desktop + iOS) ignores preload hints on videos that
+            // never call play(), so a visible layer can sit stuck on its
+            // poster at readyState 1. An explicit load() is the reliable
+            // trigger that actually starts fetching its frames.
+            forceLoadOnce(media)
           }
         }
       }
